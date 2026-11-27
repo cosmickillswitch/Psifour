@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Psi Phi">
+<meta name="theme-color" content="#131318">
+<title>Psi Phi</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>:root{--bg:#131318;--panel:#1c1c23;--panel2:#24242d;--ink:#ededf3;--muted:#9b9bab;--rule:#2e2e39;--accent:#e0a458}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "IBM Plex Sans",-apple-system,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:1240px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 80px max(18px,env(safe-area-inset-left))}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.logo{width:44px;height:44px;flex:none}
+h1{margin:0;font-size:26px;letter-spacing:-.01em}
+h1 small{display:block;font-size:13px;font-weight:400;color:var(--muted);letter-spacing:0}
+.grow{flex:1}
+#q{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:10px 14px;width:min(320px,100%)}
+h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 12px;font-weight:600;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.app{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 8px 12px;border-radius:16px;background:var(--panel);border:1px solid var(--rule);text-align:center;transition:transform .12s,border-color .12s}
+.app:hover{border-color:#4a4a58;transform:translateY(-1px)}
+.app .ic{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;font-size:25px;color:#111;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.app b{font-size:13.5px;font-weight:600}
+.app .new{position:absolute;right:6px;top:6px;width:26px;height:26px;border-radius:13px;border:1px solid var(--rule);background:var(--panel2);cursor:pointer;font-size:15px;line-height:1;display:grid;place-items:center}
+.app .new:hover{border-color:var(--accent);color:var(--accent)}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.crumbs{display:flex;align-items:center;gap:6px;font-size:20px;font-weight:700;flex-wrap:wrap;margin-right:auto}
+.crumbs span{cursor:pointer;opacity:.55;padding:2px 4px;border-radius:6px}.crumbs span:last-child{opacity:1;cursor:default}
+.crumbs span.dropok{background:var(--panel2);outline:2px dashed var(--accent)}
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--rule);background:var(--panel);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--panel2)}
+.btn.on{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1b1306;font-weight:600}
+select.btn{padding:0 8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--rule);background:var(--panel);border-radius:99px;padding:4px 11px;font-size:12.5px;color:var(--muted);cursor:pointer}
+.chip.on{color:var(--ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px 16px}
+.card{position:relative;display:block;cursor:pointer;min-width:0;border-radius:14px;outline:none}
+.card:focus-visible .th{outline:2px solid var(--accent)}
+.card .th{aspect-ratio:4/3;border-radius:12px;background:var(--panel2);border:1px solid var(--rule);overflow:hidden;display:grid;place-items:center;position:relative}
+.card .th img{width:100%;height:100%;object-fit:cover;display:block}
+.card .th .big{font-size:38px;opacity:.85}
+.card .tag{position:absolute;left:8px;bottom:8px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;color:#111}
+.card .pin{position:absolute;left:8px;top:8px;font-size:13px}
+.card .nm{margin-top:7px;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .dt{font-size:12px;color:var(--muted)}
+.card .more{position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:15px;border:none;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;opacity:.85}
+.card .tick{position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:12px;border:2px solid #fff;background:rgba(0,0,0,.35);display:none}
+.selecting .card .tick{display:block}.selecting .card .more{display:none}
+.card.sel .tick{background:var(--accent);border-color:var(--accent)}
+.card.sel .tick::after{content:"✓";display:grid;place-items:center;height:100%;font-size:13px;color:#111;font-weight:700}
+.folder .th{background:none;border:none;overflow:visible}
+.folder .th svg{width:88%;height:88%}
+.folder .count{position:absolute;bottom:14%;left:0;right:0;text-align:center;font-size:12px;font-weight:600;color:rgba(0,0,0,.55)}
+.card.dropok .th{outline:3px dashed var(--accent);outline-offset:3px}
+.strip{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,170px);gap:14px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.empty{color:var(--muted);padding:18px 0}
+.selbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:30;display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:14px;background:#2b2b33;border:1px solid var(--rule);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.menu{position:fixed;z-index:60;min-width:220px;max-width:min(320px,92vw);max-height:70vh;overflow:auto;background:#2b2b33;border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.5);padding:5px}
+.menu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:none;background:transparent;padding:8px 10px;border-radius:8px;cursor:pointer}
+.menu button:hover{background:#34343e}
+.menu h5{margin:8px 10px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.menu hr{border:none;border-top:1px solid var(--rule);margin:4px 6px}
+.menu .cols{display:flex;gap:6px;padding:6px 10px}.menu .cols i{width:22px;height:22px;border-radius:6px;cursor:pointer;display:inline-block}
+.tipbar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--rule);color:var(--muted);font-size:13.5px;margin-bottom:6px}
+.tipbar b{color:var(--ink)}
+#toast{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#33333d;padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:90;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.show{opacity:1}
+@media (max-width:600px){.apps{grid-template-columns:repeat(4,1fr);gap:8px}.app{padding:10px 4px}.app .ic{width:44px;height:44px;font-size:21px}.app b{font-size:11.5px}.app .new{display:none}.grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="logo" viewBox="0 0 200 200" aria-hidden="true"><rect width="200" height="200" rx="44" fill="#000"/><path d="M40 150 C 70 150 75 55 100 55 C 125 55 130 150 160 150" fill="none" stroke="#58C4DD" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="55" r="15" fill="#F0AC5F"/><circle cx="62" cy="122" r="9" fill="#FC6255"/><circle cx="138" cy="122" r="9" fill="#83C167"/></svg>
+    <h1>Psi Phi<small>Studio, notes and tools for science</small></h1>
+    <span class="grow"></span>
+    <input id="q" type="search" placeholder="Search all your files" aria-label="Search all your files">
+  </header>
+  <div id="tip"></div>
+  <h2>Apps</h2>
+  <div class="apps" id="apps"></div>
+  <section id="recentSec"><h2>Recent</h2><div class="strip" id="recent"></div></section>
+  <h2>Files</h2>
+  <div class="tools">
+    <div class="crumbs" id="crumbs"></div>
+    <div class="chips" id="chips"></div>
+    <select id="sort" class="btn" aria-label="Sort"><option value="at">Last edited</option><option value="name">Name</option><option value="app">App</option></select>
+    <button id="newFolder" class="btn" type="button">📁 New folder</button>
+    <button id="newHere" class="btn" type="button">＋ New here</button>
+    <button id="selBtn" class="btn" type="button">Select</button>
+  </div>
+  <div id="files"><div class="empty">Loading…</div></div>
+</div>
+<div id="toast" role="status"></div>
+<script src="hub.js"></script>
+<script src="home.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>

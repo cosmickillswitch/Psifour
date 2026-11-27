@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2a211b">
+<title>Shelf</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Serif:ital,wght@0,500;0,700;1,500&display=swap">
+<style>
+:root{--wall:#2a211b;--wall2:#33281f;--ink:#f1e9df;--muted:#b8a897;--bar:#1f1813;--rule:#4a3a2d;--accent:#e0a458;--panel:#2b221c;--panel2:#3a2e25}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--wall);color:var(--ink);font:14px/1.35 "IBM Plex Sans",-apple-system,system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,input,select{font:inherit;color:inherit}
+[hidden]{display:none!important}
+#top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;padding:calc(7px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 7px max(12px,env(safe-area-inset-left));background:rgba(31,24,19,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.brand{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.grow{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--rule);background:var(--panel);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--panel2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#22160a;font-weight:600}
+.btn.on{border-color:var(--accent);color:var(--accent)}
+.btn.quiet{background:transparent}
+#q{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:7px 11px;width:190px;max-width:36vw}
+/* the room */
+#room{padding:18px max(14px,env(safe-area-inset-right)) 120px max(14px,env(safe-area-inset-left));min-height:calc(100% - 52px);background:radial-gradient(ellipse at 50% -10%,rgba(255,210,150,.10),transparent 60%),repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 1px,transparent 1px 90px),var(--wall)}
+.shelf{margin:0 auto 34px;max-width:1500px}
+.shead{display:flex;align-items:center;gap:8px;margin:0 6px 6px;color:var(--muted)}
+.shead .nm{font:600 13px/1 "IBM Plex Sans";letter-spacing:.06em;text-transform:uppercase;cursor:text;padding:4px 6px;border-radius:6px;outline:none}
+.shead .nm:focus{background:var(--panel);color:var(--ink)}
+.shead .ct{font-size:12px;opacity:.7}
+.shead button{border:none;background:transparent;color:var(--muted);cursor:pointer;padding:4px 8px;border-radius:8px}
+.shead button:hover{background:var(--panel)}
+.row{position:relative;display:flex;align-items:flex-end;gap:3px;padding:16px 18px 0;min-height:230px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;border-radius:6px 6px 0 0;
+  background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.18) 30%,rgba(0,0,0,.22)),var(--back,#3b2b1f)}
+.row::-webkit-scrollbar{height:6px}.row::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+.plank{height:22px;border-radius:0 0 5px 5px;position:relative;box-shadow:0 12px 18px rgba(0,0,0,.45);background:var(--plank)}
+.plank::after{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:rgba(255,255,255,.18)}
+.oak{--plank:linear-gradient(180deg,#c99a63,#a9773f 60%,#8b5e2e);--back:#5a4330}
+.walnut{--plank:linear-gradient(180deg,#7a5236,#5b3a24 60%,#45291a);--back:#2f2018}
+.white{--plank:linear-gradient(180deg,#f4f1ec,#dcd6cc 60%,#c6beb2);--back:#e9e4dc}
+.metal{--plank:linear-gradient(180deg,#a8adb3,#7d838a 60%,#62686f);--back:#3a3e43}
+.glass{--plank:linear-gradient(180deg,rgba(210,235,245,.55),rgba(160,200,215,.35));--back:#24303a}
+.white .row{background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.03) 30%),var(--back)}
+.empty-row{color:var(--muted);font-size:13px;padding:0 6px 70px;opacity:.8;white-space:nowrap}
+.white .empty-row{color:#7a6e60}
+/* items */
+.it{position:relative;flex:none;cursor:pointer;transform-origin:50% 100%;transition:transform .15s;touch-action:pan-x pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.it:hover{transform:translateY(-6px)}
+.it.dragging{opacity:.25}
+.spine{position:relative;height:100%;width:100%;border-radius:3px 3px 1px 1px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),2px 0 3px rgba(0,0,0,.35)}
+.spine::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.38),rgba(255,255,255,.16) 28%,rgba(255,255,255,.04) 55%,rgba(0,0,0,.32));pointer-events:none}
+.spine.cloth::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),repeating-linear-gradient(-45deg,rgba(0,0,0,.06) 0 1px,transparent 1px 3px);pointer-events:none}
+.spine.leather::after{content:"";position:absolute;left:3px;right:3px;top:12%;bottom:12%;border-top:2px solid rgba(232,195,120,.75);border-bottom:2px solid rgba(232,195,120,.75);box-shadow:0 5px 0 -3px rgba(232,195,120,.6),0 -5px 0 -3px rgba(232,195,120,.6);pointer-events:none}
+.spine.gloss::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 30%,rgba(255,255,255,.22) 45%,transparent 60%);pointer-events:none}
+.spine .t{writing-mode:vertical-rl;transform:rotate(180deg);font:600 12px/1.1 "IBM Plex Serif",Georgia,serif;letter-spacing:.02em;max-height:86%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;position:relative;z-index:1}
+.spine .a{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:9px;opacity:.8;z-index:1;white-space:nowrap;overflow:hidden}
+.spine .coil{position:absolute;left:50%;top:4px;bottom:4px;width:8px;margin-left:-4px;background:repeating-linear-gradient(180deg,#d7d7dd 0 3px,#8a8a92 3px 5px,transparent 5px 9px);z-index:2;border-radius:3px}
+.spine .ring{position:absolute;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:2px solid rgba(255,255,255,.55);z-index:2}
+.cover{position:relative;height:100%;width:100%;border-radius:2px 5px 5px 2px;overflow:hidden;background:#ddd;box-shadow:0 6px 14px rgba(0,0,0,.45),inset 3px 0 0 rgba(0,0,0,.18)}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover .gl{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.28),rgba(255,255,255,0) 35%,rgba(255,255,255,0) 70%,rgba(255,255,255,.12));pointer-events:none}
+.cover .ph{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:12px;font:700 15px/1.2 "IBM Plex Serif",serif;text-align:center}
+.it.mag .cover,.it.comic .cover{border-radius:1px 3px 3px 1px}
+.it.lean{transform:rotate(-4deg)}.it.lean:hover{transform:rotate(-4deg) translateY(-6px)}
+/* paper stacks: sheets seen from the front with the top sheet in perspective */
+.stack{position:relative;height:100%;width:100%}
+.stack .sheets{position:absolute;left:0;right:0;bottom:0;background:repeating-linear-gradient(180deg,#f7f3ea 0 1px,#d9d2c4 1px 2px);border-radius:1px;box-shadow:0 4px 8px rgba(0,0,0,.35)}
+.stack .top{position:absolute;left:4%;right:4%;transform-origin:50% 100%;transform:perspective(500px) rotateX(64deg);background:#fff;border-radius:1px;overflow:hidden;box-shadow:0 -1px 0 rgba(0,0,0,.08)}
+.stack .top img{width:100%;height:100%;object-fit:cover;display:block}
+.it .badge{position:absolute;left:50%;transform:translateX(-50%);bottom:-20px;font-size:10px;color:var(--muted);white-space:nowrap;max-width:140%;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.ghost{position:fixed;z-index:100;pointer-events:none;opacity:.92;transform:rotate(-3deg) scale(1.05);filter:drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.drop{flex:none;width:6px;align-self:stretch;margin:10px 0 0;border-radius:3px;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.prog{position:absolute;left:3px;right:3px;bottom:3px;height:3px;border-radius:2px;background:rgba(0,0,0,.35);z-index:3;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent)}
+/* menus and dialogs */
+.menu{position:fixed;z-index:200;min-width:230px;max-width:min(340px,94vw);max-height:70vh;overflow:auto;background:#2f251e;border:1px solid var(--rule);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.55);padding:5px}
+.menu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:none;background:transparent;padding:8px 10px;border-radius:8px;cursor:pointer}
+.menu button:hover{background:var(--panel2)}
+.menu h5{margin:8px 10px 4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.menu hr{border:none;border-top:1px solid var(--rule);margin:4px 6px}
+dialog{background:#2b221c;color:var(--ink);border:1px solid var(--rule);border-radius:16px;padding:0;width:min(520px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dlg{padding:18px}
+.dlg h2{margin:0 0 10px;font-size:18px}
+.dlg label{display:block;margin:10px 0 4px;color:var(--muted);font-size:12.5px}
+.dlg input[type=text],.dlg select{width:100%;background:var(--panel);border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
+.dlg .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kinds button{border:2px solid var(--rule);background:var(--panel);border-radius:10px;padding:8px 4px;cursor:pointer;font-size:12.5px}
+.kinds button.on{border-color:var(--accent);color:var(--accent)}
+.sws{display:flex;gap:6px;flex-wrap:wrap}
+.sws i{width:28px;height:28px;border-radius:7px;cursor:pointer;border:2px solid transparent}
+.sws i.on{border-color:#fff}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#3a2e25;color:var(--ink);padding:10px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:300;max-width:90vw;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.show{opacity:1}
+.welcome{max-width:640px;margin:40px auto;text-align:center;color:var(--muted);line-height:1.6}
+.welcome h2{color:var(--ink);font:700 24px "IBM Plex Serif",serif;margin:0 0 8px}
+/* reader */
+#reader{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;background:#17120e}
+#reader.desk{background:radial-gradient(ellipse at 50% 40%,#5d4632,#2e2219)}
+#reader.mag{background:#1b1b1f}
+#rbar{display:flex;align-items:center;gap:6px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;background:rgba(20,15,12,.9);z-index:5;transition:opacity .2s}
+#rbar .ttl{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+#rbar .pc{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:13px}
+#rfoot{display:flex;align-items:center;gap:10px;padding:6px 14px calc(8px + env(safe-area-inset-bottom));z-index:5;transition:opacity .2s}
+#rfoot input{flex:1;accent-color:var(--accent)}
+#reader.calm #rbar,#reader.calm #rfoot{opacity:0;pointer-events:none}
+#stage{position:relative;flex:1;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+#zoomer{position:absolute;inset:0;transform-origin:0 0}
+#book{position:absolute;perspective:2400px}
+.mir{transform:scaleX(-1)}
+.pg{position:absolute;top:0;overflow:hidden;background:#fbf8f1}
+.pg img,.face img{width:100%;height:100%;object-fit:fill;display:block;pointer-events:none;-webkit-user-drag:none}
+.pg.l{box-shadow:inset -18px 0 22px -14px rgba(0,0,0,.45)}
+.pg.r{box-shadow:inset 18px 0 22px -14px rgba(0,0,0,.45)}
+.single .pg.r{box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.edge{position:absolute;top:2px;bottom:2px;background:repeating-linear-gradient(90deg,#e9e2d3 0 1px,#cfc6b4 1px 2px);border-radius:2px}
+#reader.mag .edge{background:repeating-linear-gradient(90deg,#f2f2f2 0 1px,#d0d0d0 1px 2px)}
+.leaf{position:absolute;top:0;transform-style:preserve-3d;transform-origin:0 50%;z-index:4}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:#fbf8f1}
+.face.back{transform:rotateY(180deg)}
+.face .sh{position:absolute;inset:0;pointer-events:none}
+.paperback{background:#f4efe4}
+.paperback img{opacity:.08;transform:scaleX(-1)}
+.gut{position:absolute;inset:0;pointer-events:none}
+.board{position:absolute;border-radius:4px;box-shadow:0 18px 40px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.08);background-image:linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.18))!important}
+#book .board{background-blend-mode:overlay}
+.gloss{position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.18),rgba(255,255,255,0) 30%)}
+/* paper stack reader */
+.sheet{position:absolute;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.45);overflow:hidden;will-change:transform}
+.sheet img{width:100%;height:100%;object-fit:fill;display:block;pointer-events:none}
+#thumbs{position:absolute;inset:0;z-index:8;background:rgba(15,11,8,.96);overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;align-content:start}
+#thumbs .tb{cursor:pointer;text-align:center;font-size:11.5px;color:var(--muted)}
+#thumbs .tb img{width:100%;aspect-ratio:var(--ar,0.72);object-fit:cover;background:#fff;border-radius:2px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+#thumbs .tb.cur img{outline:3px solid var(--accent);outline-offset:2px}
+#thumbs .tb.bm::after{content:"🔖";display:block}
+#speak{z-index:6;padding:8px 14px 6px;background:rgba(24,18,14,.96);border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:6px}
+#reader.calm #speak{opacity:1;pointer-events:auto}
+#speak:not([hidden]) ~ #rfoot{display:none}
+.cap{font:500 16px/1.45 "IBM Plex Serif",Georgia,serif;max-height:3.1em;overflow:hidden;color:var(--muted);text-align:center;padding:0 6px}
+.cap span{cursor:pointer;border-radius:3px}.cap span:hover{color:var(--ink)}
+.cap mark{background:var(--accent);color:#1d1308;padding:0 2px;border-radius:3px}
+.scrub{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.scrub .track{position:relative;flex:1}
+.scrub input{width:100%;accent-color:var(--accent);height:28px}
+#spTip{position:absolute;bottom:30px;transform:translateX(-50%);background:#3a2e25;color:var(--ink);padding:5px 9px;border-radius:8px;font-size:12px;white-space:nowrap;pointer-events:none;display:none;box-shadow:0 4px 12px rgba(0,0,0,.4);max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+.ctrls{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.ctrls button{min-width:40px;height:40px;border-radius:20px;border:1px solid var(--rule);background:var(--panel);cursor:pointer;font-size:15px;touch-action:none;-webkit-user-select:none;user-select:none}
+.ctrls button:active,.ctrls button.held{background:var(--panel2);border-color:var(--accent)}
+.ctrls .play{min-width:56px;height:48px;border-radius:24px;background:var(--accent);color:#1d1308;border-color:var(--accent);font-size:19px}
+.speed{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
+.speed input{width:120px;accent-color:var(--accent)}
+.speed button{min-width:32px;height:32px}
+.speed .rl{min-width:62px;font-variant-numeric:tabular-nums;font-size:13px}
+#spVoice{max-width:170px;height:36px;border-radius:10px;background:var(--panel);border:1px solid var(--rule);padding:0 6px}
+.hlw,.hls{position:absolute;pointer-events:none;border-radius:2px;z-index:2}
+.hlw{background:rgba(255,190,40,.48);mix-blend-mode:multiply;box-shadow:0 0 0 2px rgba(255,190,40,.35)}
+.hls{background:rgba(255,215,120,.2);mix-blend-mode:multiply}
+@media (max-width:640px){.speed input{width:80px}#spVoice{max-width:120px}.ctrls button{min-width:36px;height:36px}}
+#busy{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);display:grid;place-items:center}
+#busy div{background:#2b221c;border:1px solid var(--rule);border-radius:14px;padding:18px 22px;min-width:260px;text-align:center}
+#busy progress{width:100%;margin-top:10px;accent-color:var(--accent)}
+@media (max-width:640px){#q{width:120px}.row{min-height:200px}.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<header id="top">
+  <span class="brand"><span aria-hidden="true">📚</span> Shelf</span>
+  <span class="grow"></span>
+  <input id="q" type="search" placeholder="Search titles" aria-label="Search titles">
+  <button id="viewBtn" class="btn" type="button" title="Show spines or covers">▥ Spines</button>
+  <button id="addBtn" class="btn primary" type="button">＋ Add</button>
+</header>
+<main id="room" aria-label="Bookshelves"></main>
+<section id="reader" hidden aria-label="Reader">
+  <div id="rbar">
+    <button id="rBack" class="btn quiet" type="button">‹ Shelf</button>
+    <span class="ttl" id="rTitle"></span>
+    <span class="pc" id="rPage"></span>
+    <button id="rSpeak" class="btn quiet" type="button" title="Read aloud" aria-label="Read aloud">🔊</button>
+    <button id="rBm" class="btn quiet" type="button" title="Bookmark this page" aria-label="Bookmark">🔖</button>
+    <button id="rThumbs" class="btn quiet" type="button" title="All pages" aria-label="All pages">▦</button>
+    <button id="rMore" class="btn quiet" type="button" aria-label="More">⋯</button>
+  </div>
+  <div id="stage"><div id="zoomer"></div></div>
+  <div id="speak" hidden aria-label="Read aloud">
+    <div id="spCap" class="cap" aria-live="off"></div>
+    <div class="scrub"><span id="spT0">0:00</span><div class="track"><input id="spPos" type="range" min="0" max="1" step="1" value="0" aria-label="Position in the text"><div id="spTip"></div></div><span id="spT1">−0:00</span></div>
+    <div class="ctrls">
+      <button id="spPrevS" type="button" title="Back a sentence (,)" aria-label="Back a sentence">⏮</button>
+      <button id="spRw" type="button" title="Tap: back 10 s · hold: rewind" aria-label="Rewind">⏪</button>
+      <button id="spPlay" type="button" class="play" title="Play or pause (space)" aria-label="Play">▶</button>
+      <button id="spFf" type="button" title="Tap: forward 10 s · hold: fast forward" aria-label="Fast forward">⏩</button>
+      <button id="spNextS" type="button" title="Forward a sentence (.)" aria-label="Forward a sentence">⏭</button>
+      <span class="speed"><button id="spSlow" type="button" aria-label="Slower">−</button><input id="spRate" type="range" min="0.5" max="3" step="0.05" value="1" aria-label="Reading speed"><button id="spFast" type="button" aria-label="Faster">＋</button><button id="spRateL" type="button" class="rl" title="Speed presets">1.00×</button></span>
+      <select id="spVoice" aria-label="Voice"></select>
+      <button id="spClose" type="button" title="Close the player" aria-label="Close the player">✕</button>
+    </div>
+  </div>
+  <div id="rfoot"><button id="rPrev" class="btn quiet" type="button" aria-label="Previous page">‹</button><input id="rSlider" type="range" min="0" max="1" value="0" aria-label="Page"><button id="rNext" class="btn quiet" type="button" aria-label="Next page">›</button></div>
+</section>
+<div id="toast" role="status"></div>
+<input id="filePdf" type="file" accept="application/pdf,.pdf" hidden>
+<input id="fileImg" type="file" accept="image/*" multiple hidden>
+<script src="hub.js"></script>
+<script src="shelf.js"></script>
+<script>if('serviceWorker' in navigator&&location.protocol==='https:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
